@@ -38,7 +38,7 @@ async def get_user_by_id(
     current_user: User = Depends(get_current_user),
     user_controller: UserController = Depends(UserController),
 ) -> UserReadSchema:
-    if current_user.role_id in (1, 2, 3):
+    if current_user.role_id in (1, 2, 3) or current_user.id == user_id:
         return await user_controller.get_user_by_id(user_id=user_id)
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
@@ -47,7 +47,7 @@ async def get_user_by_id(
 
 
 @router.get(
-    "/",
+    "",
     status_code=status.HTTP_200_OK,
     response_model=UserListSchema,
 )
@@ -75,10 +75,30 @@ async def update_user(
     user_id: int,
     payload: UserUpdateSchema,
     current_user: User = Depends(get_current_user),
-    user_controller: UserController = Depends(UserController),
+    user_controller: UserController = Depends(),
 ) -> UserReadSchema:
     if current_user.role_id in (1, 2) or current_user.id == user_id:
         return await user_controller.update_user(user_id=user_id, payload=payload)
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="You do not have permission to access this resource.",
+    )
+
+
+@router.delete(
+    "/{user_id}/",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete user by ID",
+    description="Delete a user by providing the user ID.",
+)
+async def delete_user(
+    user_id: int,
+    current_user: User = Depends(get_current_user),
+    user_controller: UserController = Depends(),
+) -> None:
+    if current_user.role_id in (1, 2) or current_user.id == user_id:
+        await user_controller.delete_user(user_id=user_id)
+        return
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
         detail="You do not have permission to access this resource.",

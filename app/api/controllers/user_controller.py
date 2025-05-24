@@ -47,3 +47,12 @@ class UserController:
                 detail="User not found",
             )
         return UserReadSchema.model_validate(user)
+
+    async def delete_user(self, user_id: int) -> None:
+        user = await self.get_user_by_id(user_id)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found",
+            )
+        await self.user_repository.delete_user(user_id)

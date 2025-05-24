@@ -6,8 +6,11 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
 from typing import Any
 from secrets import randbelow
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 
 from app.api.repositories import UserRepository
+from app.core.databases.postgres import get_general_session
 from app.core.settings import get_settings, Settings
 from app.api.models import User
 
@@ -74,16 +77,17 @@ class JWTHandler:
         tokens = self.create_tokens(data)
         return {"access_token": tokens["access_token"], "refresh_token": refresh_token}
 
-    async def get_current_user(self, token: str) -> User:
+    async def get_current_user(self, token: str, session) -> User:
         payload = self.verify_token(token)
-        user_id = payload.get("sub")
+        user_id = payload.get("id")
         if user_id is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid token payload",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        user = await self._user_repository.get_user_by_id(user_id)
+        is_exist = await session.execute(select(User).where(User.id == user_id))
+        user: User = is_exist.scalar_one_or_none()
         if user is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -132,5 +136,6 @@ security = Security()
 
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
+    session: AsyncSession = Depends(get_general_session),
 ) -> User:
-    return await jwt_handler.get_current_user(token)
+    return await jwt_handler.get_current_user(token, session)

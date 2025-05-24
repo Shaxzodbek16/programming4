@@ -28,7 +28,6 @@ class UserUpdateSchema(BaseModel):
     last_name: str | None = Field(None, max_length=100)
     profile_picture: str | None = Field(None, max_length=100)
     password: str | None = Field(None, min_length=8)
-    role_id: int | None
 
     model_config = ConfigDict(from_attributes=True)
 

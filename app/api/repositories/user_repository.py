@@ -69,3 +69,12 @@ class UserRepository:
         await self.__session.commit()
         await self.__session.refresh(user)
         return user
+
+    async def delete_user(self, user_id: int) -> None:
+        user = await self.get_user_by_id(user_id)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+            )
+        await self.__session.delete(user)
+        await self.__session.commit()

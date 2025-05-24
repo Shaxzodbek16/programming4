@@ -10,6 +10,7 @@ from app.api.schemas.users_schemas import (
     UserResendSchema,
     UserLoginSchema,
     UserReadSchemaWithToken,
+    RefreshTokenSchema,
 )
 from app.core.utils.security import jwt_handler, security, JWTHandler, Security
 from app.api.tasks.email import send_verification_email
@@ -41,7 +42,7 @@ class AuthenticationController:
         data = {k: v for k, v in payload.items() if k not in ("password", "role_id")}
         return self.__jwt_handler.create_tokens(data)
 
-    async def refresh_tokens(self, refresh_token: str) -> dict:
+    async def refresh_tokens(self, refresh_token: str) -> dict[str, str]:
         return self.__jwt_handler.refresh_access_token(refresh_token)
 
     async def register_user(self, payload: UserCreateSchema) -> UserReadSchema:
@@ -96,4 +97,4 @@ class AuthenticationController:
                 detail="Invalid password",
             )
         tokens = await self.generate_tokens(user.to_dict())
-        return UserReadSchemaWithToken.model_validate(user, **tokens)
+        return UserReadSchemaWithToken(**user.to_dict(), **tokens)

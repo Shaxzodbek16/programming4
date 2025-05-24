@@ -67,9 +67,10 @@ class User(BaseModel):
             "full_name": self.full_name,
             "profile_picture": self.profile_picture,
             "email": self.email,
+            "is_active": self.is_active,
             "role_id": self.role_id,
-            "created_at": self.created_at,
-            "updated_at": self.updated_at,
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat(),
         }
 
 

@@ -5,11 +5,12 @@ from celery import shared_task
 
 from app.core.settings import get_settings, Settings
 from app.api.tasks.email_template import EMAIL_TEMPLATE
+from app.core.celery import celery
 
 settings: Settings = get_settings()
 
 
-@shared_task
+@celery.task
 def send_verification_email(email: str, code: int):
     sender_email = settings.EMAIL
     sender_password = settings.EMAIL_PASSWORD

@@ -20,7 +20,8 @@ router = APIRouter(
     "/register/", status_code=status.HTTP_201_CREATED, response_model=UserReadSchema
 )
 async def register_user(
-    payload: UserCreateSchema, auth_controller: AuthenticationController = Depends()
+    payload: UserCreateSchema,
+    auth_controller: AuthenticationController = Depends(),
 ):
     return await auth_controller.register_user(payload)
 
@@ -62,7 +63,7 @@ async def login_user(
 @router.post(
     "/refresh/",
     status_code=status.HTTP_200_OK,
-    response_model=UserReadSchemaWithToken,
+    response_model=dict[str, str],
 )
 async def refresh_token(
     payload: RefreshTokenSchema,
