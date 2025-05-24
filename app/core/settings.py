@@ -24,6 +24,18 @@ class Settings(BaseSettings):
     REDIS_PORT: str
     REDIS_DB: str
 
+    # JWT CREDENTIALS
+    SECRET_KEY: str
+    ALGORITHM: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int
+    REFRESH_TOKEN_EXPIRE_MINUTES: int
+
+    # EMAIL CREDENTIALS
+    EMAIL_PASSWORD: str
+    EMAIL: str
+    SMTP_PORT: int
+    SMTP_SERVER: str
+
     model_config = SettingsConfigDict(env_file=".env")
 
     @property
