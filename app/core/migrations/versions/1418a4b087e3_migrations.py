@@ -1,8 +1,8 @@
 """migrations
 
-Revision ID: c7af975b5526
+Revision ID: 1418a4b087e3
 Revises:
-Create Date: 2025-05-23 18:09:26.913163
+Create Date: 2025-05-24 15:24:41.385959
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "c7af975b5526"
+revision: str = "1418a4b087e3"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -168,7 +168,7 @@ def upgrade() -> None:
     op.create_table(
         "user_otp",
         sa.Column("user_id", sa.Integer(), nullable=False),
-        sa.Column("otp_code", sa.Integer(), nullable=False),
+        sa.Column("otp_code", sa.BigInteger(), nullable=False),
         sa.Column("expires_at", sa.DateTime(), nullable=False),
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False),

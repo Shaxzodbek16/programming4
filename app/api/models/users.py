@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, UTC
+from datetime import datetime, UTC, timedelta
 from typing import TYPE_CHECKING
 from sqlalchemy import Boolean, DateTime, ForeignKey, String, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -81,7 +81,9 @@ class UserOTP(BaseModel):
     )
 
     otp_code: Mapped[int] = mapped_column(BigInteger, nullable=False)
-    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, default=datetime.utcnow() + timedelta(minutes=5)
+    )
 
     user: Mapped["User"] = relationship("User", back_populates="otp_codes")
 
