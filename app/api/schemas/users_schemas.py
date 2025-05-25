@@ -1,6 +1,8 @@
 from datetime import datetime
 from pydantic import BaseModel, Field, ConfigDict
 
+from app.api.schemas.base import QueryList
+
 
 class UserResendSchema(BaseModel):
     email: str
@@ -56,11 +58,7 @@ class RefreshTokenSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class UserListQuery(BaseModel):
-    search: str | None = None
-    page: int = Field(1, ge=1)
-    size: int = Field(10, ge=1, le=100)
-
+class UserListQuery(QueryList):
     model_config = ConfigDict(from_attributes=True)
 
 

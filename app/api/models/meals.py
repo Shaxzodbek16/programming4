@@ -32,9 +32,13 @@ class Meal(BaseModel):
         return {mi.ingredient_id: mi.required_qty * portions for mi in self.ingredients}
 
     def to_dict(self) -> dict:
-        data = super().to_dict()
-        data.update({"name": self.name, "picture": self.picture})
-        return data
+        return {
+            "id": self.id,
+            "name": self.name,
+            "picture": self.picture,
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat(),
+        }
 
 
 class MealIngredient(BaseModel):
@@ -59,7 +63,7 @@ class MealIngredient(BaseModel):
             "id": self.id,
             "meal_id": self.meal_id,
             "ingredient_id": self.ingredient_id,
-            "required_qty": str(self.required_qty),
+            "required_qty": self.required_qty,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
         }

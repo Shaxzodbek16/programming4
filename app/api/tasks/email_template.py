@@ -59,6 +59,11 @@ EMAIL_TEMPLATE = """<!DOCTYPE html>
             color: #999;
             font-size: 12px;
         }
+        
+        .footer p a {
+            color: #667eea;
+            text-decoration: none;
+        }
         .button {
             display: inline-block;
             padding: 12px 25px;
@@ -88,7 +93,7 @@ EMAIL_TEMPLATE = """<!DOCTYPE html>
 
             <p class="message">
                 Enter this code to complete your verification.<br>
-                <strong>This code expires in 10 minutes.</strong>
+                <strong>This code expires in 5 minutes.</strong>
             </p>
 
             <p class="message">
@@ -98,7 +103,7 @@ EMAIL_TEMPLATE = """<!DOCTYPE html>
 
         <div class="footer">
             <p>This is an automated message. Please do not reply.</p>
-            <p>&copy; 2024 Your Company Name. All rights reserved.</p>
+            <p>&copy; 2024 <a href="shaxzodbek.com">Shaxzodbek </a>. All rights reserved.</p>
         </div>
     </div>
 </body>

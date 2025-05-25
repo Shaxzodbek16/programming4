@@ -2,6 +2,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from fastapi import Depends
 from typing import Sequence
+from fastapi import HTTPException, status
+from sqlalchemy.exc import IntegrityError
 
 from app.api.schemas.ingredients_schemas import (
     IngredientListQuery,
@@ -56,9 +58,17 @@ class IngredientRepository:
         ingredient = await self.get_ingredient(ingredient_id=ingredient_id)
         if ingredient:
             ingredient.update(**payload.model_dump())
-            await self.__session.commit()
-            await self.__session.refresh(ingredient)
-            return ingredient
+            try:
+                self.__session.add(ingredient)
+                await self.__session.commit()
+                await self.__session.refresh(ingredient)
+                return ingredient
+            except IntegrityError as e:
+                await self.__session.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Ingredient with this name already exists.",
+                )
         return None
 
     async def delete_ingredient(self, ingredient_id: int) -> None:

@@ -1,7 +1,6 @@
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from celery import shared_task
 
 from app.core.settings import get_settings, Settings
 from app.api.tasks.email_template import EMAIL_TEMPLATE

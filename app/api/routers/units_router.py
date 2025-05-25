@@ -16,7 +16,7 @@ router = APIRouter(
 
 
 @router.get(
-    "/",
+    "",
     status_code=status.HTTP_200_OK,
     response_model=list[UnitReadSchema],
 )
@@ -33,7 +33,7 @@ async def get_all_units(
 
 
 @router.get(
-    "/{unit_id}/",
+    "/{unit_id}",
     status_code=status.HTTP_200_OK,
     response_model=UnitReadSchema,
 )
@@ -50,7 +50,7 @@ async def get_unit_by_id(
     return await unit_controller.get_unit_by_id(unit_id=unit_id)
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=UnitCreateSchema)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=UnitReadSchema)
 async def create_unit(
     payload: UnitCreateSchema,
     unit_controller: UnitController = Depends(),

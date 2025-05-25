@@ -58,7 +58,7 @@ services:
         max-file: "3"
 
   postgres:
-    image: postgres:17.5-alpine3.20
+    image: postgres:17.5
     restart: on-failure
     environment:
       POSTGRES_USER: postgres
@@ -82,7 +82,7 @@ services:
         max-file: "2"
 
   redis:
-    image: redis:8.0.1-alpine3.21
+    image: redis:8.0.1
     restart: on-failure
     volumes:
       - redis_data:/data

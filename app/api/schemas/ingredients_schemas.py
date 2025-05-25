@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field, ConfigDict
 
+from app.api.schemas.base import QueryList
+
 
 class IngredientBaseSchema(BaseModel):
     name: str = Field(..., max_length=100)
@@ -28,11 +30,7 @@ class IngredientReadSchema(IngredientBaseSchema):
     model_config = ConfigDict(from_attributes=True)
 
 
-class IngredientListQuery(BaseModel):
-    search: str | None = None
-    page: int = Field(1, ge=1)
-    size: int = Field(10, ge=1, le=100)
-
+class IngredientListQuery(QueryList):
     model_config = ConfigDict(from_attributes=True)
 
 

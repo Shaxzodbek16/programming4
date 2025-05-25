@@ -1,15 +1,21 @@
 from __future__ import annotations
 
 from datetime import datetime
+from enum import Enum as PythonEnum
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, String
+from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, String, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.models.base import BaseModel
 
 if TYPE_CHECKING:
     from app.api.models import Ingredient
+
+
+class TransactionType(str, PythonEnum):
+    IN = "IN"
+    OUT = "OUT"
 
 
 class IngredientTransaction(BaseModel):
@@ -23,7 +29,10 @@ class IngredientTransaction(BaseModel):
     )
 
     quantity: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
-    transaction_type: Mapped[str] = mapped_column(String(10), nullable=False)  # IN/OUT
+    transaction_type: Mapped[TransactionType] = mapped_column(
+        Enum(TransactionType, name="transaction_type_enum", create_constraint=True),
+        nullable=False,
+    )
     reference_id: Mapped[int | None] = mapped_column(Integer)
     note: Mapped[str | None] = mapped_column(String(255))
 
