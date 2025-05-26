@@ -76,3 +76,26 @@ class IngredientRepository:
         if ingredient:
             await self.__session.delete(ingredient)
             await self.__session.commit()
+
+    async def take_stock(self, ingredient_id: int, quantity: float) -> Ingredient:
+        ingredient = await self.get_ingredient(ingredient_id=ingredient_id)
+        if ingredient is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Ingredient not found",
+            )
+        ingredient.update(quantity=ingredient.quantity - quantity)
+        self.__session.add(ingredient)
+        await self.__session.commit()
+        await self.__session.refresh(ingredient)
+        return ingredient
+
+    async def low_stock_ingredients(self, limit, offset) -> Sequence[Ingredient]:
+        query = (
+            select(Ingredient)
+            .offset((offset - 1) * limit)
+            .limit(limit)
+            .where(Ingredient.quantity <= Ingredient.min_threshold)
+        )
+        result = await self.__session.execute(query)
+        return result.scalars().all()

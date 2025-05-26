@@ -1,9 +1,12 @@
 import os
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
+
+from app.api.websocket import api_v1_websocket
 from app.core.settings import Settings, get_settings
 from app.api.routers import api_v1_router
 from app.server.init import init
+from app.server.schedule import lifespan
 
 settings: Settings = get_settings()
 
@@ -18,12 +21,14 @@ def get_app() -> FastAPI:
     get_ready()
 
     app = FastAPI(
+        lifespan=lifespan,
         title=settings.PROJECT_NAME,
         description=settings.PROJECT_DESCRIPTION,
         version=settings.PROJECT_VERSION,
         docs_url="/",
     )
     app.include_router(api_v1_router, prefix=settings.API_V1_STR)
+    app.include_router(api_v1_websocket, prefix=settings.API_V1_STR)
     return app
 
 

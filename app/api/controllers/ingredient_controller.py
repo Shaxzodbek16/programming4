@@ -106,3 +106,12 @@ class IngredientController:
         await self.__ingredient_repository.delete_ingredient(
             ingredient_id=ingredient_id,
         )
+
+    async def low_stock_ingredients(self, limit, offset) -> IngredientListSchema:
+        res = await self.__ingredient_repository.low_stock_ingredients(limit, offset)
+        return IngredientListSchema(
+            total=len(res),
+            page=offset,
+            size=limit,
+            items=[IngredientReadSchema.model_validate(r) for r in res],
+        )

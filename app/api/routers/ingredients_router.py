@@ -28,7 +28,7 @@ async def get_all_ingredients(
     current_user: User = Depends(get_current_user),
     ingredient_controller: IngredientController = Depends(),
 ) -> IngredientListSchema:
-    if current_user.role_id not in (1, 2, 3):
+    if current_user.role_id not in (1, 2, 3, 4):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You do not have permission to access this resource.",
@@ -48,7 +48,7 @@ async def get_ingredient(
     current_user: User = Depends(get_current_user),
     ingredient_controller: IngredientController = Depends(),
 ) -> IngredientReadSchema:
-    if current_user.role_id not in (1, 2, 3):
+    if current_user.role_id not in (1, 2, 3, 4):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You do not have permission to access this resource.",
@@ -66,7 +66,7 @@ async def create_ingredient(
     current_user: User = Depends(get_current_user),
     ingredient_controller: IngredientController = Depends(),
 ) -> IngredientReadSchema:
-    if current_user.role_id not in (1, 2, 3):
+    if current_user.role_id not in (1, 2, 4):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You do not have permission to access this resource.",
@@ -87,7 +87,7 @@ async def update_ingredient(
     current_user: User = Depends(get_current_user),
     ingredient_controller: IngredientController = Depends(),
 ) -> IngredientReadSchema:
-    if current_user.role_id not in (1, 2, 3):
+    if current_user.role_id not in (1, 2, 4):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You do not have permission to access this resource.",
@@ -106,7 +106,7 @@ async def delete_ingredient(
     current_user: User = Depends(get_current_user),
     ingredient_controller: IngredientController = Depends(),
 ):
-    if current_user.role_id not in (1, 2, 3):
+    if current_user.role_id not in (1, 2):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You do not have permission to access this resource.",
@@ -114,3 +114,11 @@ async def delete_ingredient(
     return await ingredient_controller.delete_ingredient(
         ingredient_id=ingredient_id,
     )
+
+
+async def low_stock_ingredients(
+    limit,
+    offset,
+    ingredient_controller: IngredientController = Depends(),
+) -> IngredientListSchema:
+    return await ingredient_controller.low_stock_ingredients(limit, offset)

@@ -24,7 +24,7 @@ async def get_all_units(
     unit_controller: UnitController = Depends(),
     current_user: User = Depends(get_current_user),
 ) -> list[UnitReadSchema]:
-    if current_user.role_id not in (1, 2):
+    if current_user.role_id not in (1, 2, 3, 4):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You do not have permission to access this resource.",
@@ -42,7 +42,7 @@ async def get_unit_by_id(
     current_user: User = Depends(get_current_user),
     unit_controller: UnitController = Depends(),
 ) -> UnitReadSchema:
-    if current_user.role_id not in (1, 2):
+    if current_user.role_id not in (1, 2, 3, 4):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You do not have permission to access this resource.",
@@ -73,7 +73,7 @@ async def update_unit(
     current_user: User = Depends(get_current_user),
     unit_controller: UnitController = Depends(),
 ) -> UnitReadSchema:
-    if current_user.role_id not in (1, 2):
+    if current_user.role_id not in (1, 2, 4):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You do not have permission to access this resource.",
@@ -87,7 +87,10 @@ async def delete_unit(
     current_user: User = Depends(get_current_user),
     unit_controller: UnitController = Depends(),
 ) -> None:
-    if current_user.role_id not in (1, 2):
+    if current_user.role_id not in (
+        1,
+        2,
+    ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You do not have permission to access this resource.",

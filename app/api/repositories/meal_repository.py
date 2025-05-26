@@ -8,9 +8,10 @@ from app.api.schemas.meal_schemas import (
     MealListQuery,
     MealCreateSchema,
     MealUpdateSchema,
+    AddIngredientToMealSchema,
 )
 from app.core.databases.postgres import get_general_session
-from app.api.models import Meal
+from app.api.models import Meal, MealIngredient, MealLog
 
 
 class MealRepository:
@@ -74,5 +75,81 @@ class MealRepository:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Meal not found.",
             )
+        ingredients = await self.get_meal_ingredients(meal_id=meal_id)
+        for ingredient in ingredients:
+            await self.__session.delete(ingredient)
         await self.__session.delete(meal)
         await self.__session.commit()
+
+    async def get_meal_ingredient_by_id(
+        self, meal_id: int, ingredient_id: int
+    ) -> MealIngredient | None:
+        query = select(MealIngredient).where(
+            MealIngredient.meal_id == meal_id,
+            MealIngredient.ingredient_id == ingredient_id,
+        )
+        result = await self.__session.execute(query)
+        return result.scalar_one_or_none()
+
+    async def get_meal_ingredients(self, meal_id: int) -> Sequence[MealIngredient]:
+        query = select(MealIngredient).where(MealIngredient.meal_id == meal_id)
+        result = await self.__session.execute(query)
+        return result.scalars().all()
+
+    async def add_ingredient_to_meal(
+        self, meal_id: int, payload: AddIngredientToMealSchema
+    ):
+        existing_meal_ingredient = await self.get_meal_ingredient_by_id(
+            meal_id=meal_id, ingredient_id=payload.ingredient_id
+        )
+        if existing_meal_ingredient:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Meal with this name already exists.",
+            )
+        meal_ingredient = MealIngredient(
+            meal_id=meal_id,
+            ingredient_id=payload.ingredient_id,
+            required_qty=payload.required_qty,
+        )
+        self.__session.add(meal_ingredient)
+        await self.__session.commit()
+        await self.__session.refresh(meal_ingredient)
+        return meal_ingredient
+
+    async def remove_ingredient_from_meal(self, meal_id: int, ingredient_id: int):
+        meal_ingredient = await self.get_meal_ingredient_by_id(
+            meal_id=meal_id, ingredient_id=ingredient_id
+        )
+        if not meal_ingredient:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Meal ingredient not found.",
+            )
+        await self.__session.delete(meal_ingredient)
+        await self.__session.commit()
+
+    async def write_meal_logs(
+        self, /, *, meal_id: int, user_id: int, portion_qty: int
+    ) -> None:
+        meal_log = MealLog(meal_id=meal_id, user_id=user_id, portion_qty=portion_qty)
+        self.__session.add(meal_log)
+        await self.__session.commit()
+        await self.__session.refresh(meal_log)
+
+    async def log_meal(self, meal_id: int, payload: MealListQuery) -> Sequence[MealLog]:
+        query = (
+            select(MealLog)
+            .where(MealLog.meal_id == meal_id)
+            .offset((payload.page - 1) * payload.size)
+            .limit(payload.size)
+        )
+        if payload.search:
+            query = query.where(MealLog.user_id.ilike(f"%{payload.search}%"))
+        result = await self.__session.execute(query)
+        return result.scalars().all()
+
+    async def get_log(self, meal_id: int, log_id) -> MealLog | None:
+        query = select(MealLog).where(MealLog.meal_id == meal_id, MealLog.id == log_id)
+        result = await self.__session.execute(query)
+        return result.scalar_one_or_none()

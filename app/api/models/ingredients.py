@@ -50,6 +50,10 @@ class Ingredient(BaseModel):
     def is_low_stock(self) -> bool:
         return self.quantity <= self.min_threshold
 
+    def take_stock(self, quantity: float) -> "Ingredient":
+        self.quantity -= quantity
+        return self
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,

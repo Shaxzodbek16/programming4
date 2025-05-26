@@ -10,8 +10,8 @@ async def fill_roles():
         roles = [
             Role(name="SuperAdmin"),
             Role(name="Admin"),
+            Role(name="Chef"),
             Role(name="Manager"),
-            Role(name="User"),
         ]
         q = await session.execute(select(Role))
         ex_roles = q.scalars().all()

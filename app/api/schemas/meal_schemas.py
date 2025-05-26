@@ -1,6 +1,12 @@
 from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
 
+from app.api.schemas.ingredients_schemas import IngredientReadSchema
+
+
+class PortionQty(BaseModel):
+    portion_qty: int = Field(..., ge=1, description="portion_qty")
+
 
 class MealIngredientBase(BaseModel):
     meal_id: int
@@ -61,6 +67,15 @@ class MealReadSchema(MealBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class AddIngredientToMealSchema(BaseModel):
+    ingredient_id: int
+    required_qty: float
+
+
+class MealReadWithIngredientSchema(MealReadSchema):
+    ingredients: list[IngredientReadSchema] = Field(default_factory=list)
+
+
 class MealUpdateSchema(BaseModel):
     name: str | None = Field(None, min_length=1, max_length=100)
     picture: str | None = Field(None, max_length=255)
@@ -93,11 +108,6 @@ class MealLogReadSchema(MealLogBase):
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
-
-
-class MealLogUpdateSchema(BaseModel):
-    portion_qty: int | None = Field(None, ge=1)
-    meal_id: int | None = None
 
 
 class MealLogListSchema(BaseModel):
