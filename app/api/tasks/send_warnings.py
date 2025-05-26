@@ -3,23 +3,23 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 from app.core.settings import get_settings, Settings
-from app.api.tasks.email_template import EMAIL_TEMPLATE_FOR_CODE
+from app.api.tasks.email_template import EMAIL_TEMPLATE_FOR_WARNINGS
 from app.core.celery import celery
 
 settings: Settings = get_settings()
 
 
 @celery.task
-def send_verification_email(email: str, code: int):
+def send_warnings(email: str, product_name: str):
     sender_email = settings.EMAIL
     sender_password = settings.EMAIL_PASSWORD
 
-    html_body = EMAIL_TEMPLATE_FOR_CODE.replace("{{CODE}}", str(code)).replace(
-        "{{EMAIL}}", str(email)
-    )
+    html_body = EMAIL_TEMPLATE_FOR_WARNINGS.replace(
+        "{{PRODUCT_NAME}}", product_name
+    ).replace("{{EMAIL}}", email)
 
     msg = MIMEMultipart("alternative")
-    msg["Subject"] = f"Your verification code: {code}"
+    msg["Subject"] = f"⚠️ Low Stock Alert: {product_name}"
     msg["From"] = sender_email
     msg["To"] = email
 
@@ -33,5 +33,5 @@ def send_verification_email(email: str, code: int):
             server.send_message(msg)
         return True
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error sending warning email: {e}")
         return False

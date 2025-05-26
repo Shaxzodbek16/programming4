@@ -26,10 +26,10 @@ class Feed:
     async def _feed_ingredients(self, count: int, max_units: int) -> int:
         for i in range(count):
             new_ingredient = Ingredient(
-                name=self.__faker.word(),
+                name=self.__faker.uuid4(),
                 unit_id=self.__faker.random_int(min=1, max=max_units),
-                quantity=self.__faker.random_int(min=1, max=100),
-                min_threshold=self.__faker.random_int(min=1, max=30),
+                quantity=self.__faker.random_int(min=1, max=80),
+                min_threshold=self.__faker.random_int(min=1, max=100),
             )
             self.__session.add(new_ingredient)
         await self.__session.commit()
@@ -58,9 +58,10 @@ class Feed:
         return 2000
 
     async def run(self):
-        units_id = await self._feed_units(5)
-        ingredients_id = await self._feed_ingredients(5, units_id)
-        users_max = await self._feed_users()
+        # units_id = await self._feed_units(5)
+        units_id = 5
+        await self._feed_ingredients(100, units_id)
+        # users_max = await self._feed_users()
 
 
 async def main():

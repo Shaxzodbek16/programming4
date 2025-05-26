@@ -8,7 +8,7 @@ celery = Celery(
     "celery_worker",
     broker=settings.get_redis_url,
     backend=settings.get_redis_url,
-    include=["app.api.tasks"],
+    include=["app.api.tasks.email", "app.api.tasks.send_warnings"],
 )
 
 celery.conf.update(

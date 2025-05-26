@@ -83,6 +83,16 @@ class MealLog(BaseModel):
     meal: Mapped["Meal"] = relationship("Meal", back_populates="logs")
     user: Mapped["User"] = relationship("User", back_populates="meal_logs")
 
+    @property
+    def get_year(self) -> int:
+        return self.served_at.year
+
+    def get_month(self) -> int:
+        return self.served_at.month
+
+    def get_day(self) -> int:
+        return self.served_at.day
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,

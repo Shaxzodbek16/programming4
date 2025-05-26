@@ -78,3 +78,9 @@ class UserRepository:
             )
         await self.__session.delete(user)
         await self.__session.commit()
+
+    async def get_admin_users(self) -> Sequence[User]:
+        query = await self.__session.execute(
+            select(User).where(User.role_id.in_([1, 2, 3]))
+        )
+        return query.scalars().all()

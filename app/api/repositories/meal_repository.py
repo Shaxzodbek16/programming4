@@ -1,8 +1,9 @@
-from typing import Sequence
+from typing import Sequence, Tuple, Optional
 
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy import func, extract, cast, Date
 
 from app.api.schemas.meal_schemas import (
     MealListQuery,
@@ -153,3 +154,38 @@ class MealRepository:
         query = select(MealLog).where(MealLog.meal_id == meal_id, MealLog.id == log_id)
         result = await self.__session.execute(query)
         return result.scalar_one_or_none()
+
+    async def get_meal_portion_by_time(
+        self, year: int, month: Optional[int] = None
+    ) -> Tuple[int, Optional[int], int]:
+        stmt_year = select(func.coalesce(func.sum(MealLog.portion_qty), 0)).where(
+            extract("year", MealLog.served_at) == year
+        )
+        total_for_year = (await self.__session.execute(stmt_year)).scalar_one()
+
+        total_for_month: Optional[int] = None
+        if month is not None:
+            stmt_month = select(func.coalesce(func.sum(MealLog.portion_qty), 0)).where(
+                extract("year", MealLog.served_at) == year,
+                extract("month", MealLog.served_at) == month,
+            )
+            total_for_month = (await self.__session.execute(stmt_month)).scalar_one()
+
+        stmt_max_date = select(func.max(MealLog.served_at)).where(
+            extract("year", MealLog.served_at) == year
+        )
+        if month is not None:
+            stmt_max_date = stmt_max_date.where(
+                extract("month", MealLog.served_at) == month
+            )
+        last_dt = (await self.__session.execute(stmt_max_date)).scalar_one_or_none()
+
+        total_for_last_day = 0
+        if last_dt is not None:
+            last_date = last_dt.date()
+            stmt_day = select(func.coalesce(func.sum(MealLog.portion_qty), 0)).where(
+                cast(MealLog.served_at, Date) == last_date
+            )
+            total_for_last_day = (await self.__session.execute(stmt_day)).scalar_one()
+
+        return total_for_year, total_for_month, total_for_last_day

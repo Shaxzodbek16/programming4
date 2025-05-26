@@ -83,7 +83,7 @@ class UserOTP(BaseModel):
 
     otp_code: Mapped[int] = mapped_column(BigInteger, nullable=False)
     expires_at: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, default=datetime.utcnow() + timedelta(minutes=5)
+        DateTime, nullable=False, default=datetime.now() + timedelta(minutes=5)
     )
 
     user: Mapped["User"] = relationship("User", back_populates="otp_codes")

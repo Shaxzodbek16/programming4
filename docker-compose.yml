@@ -12,6 +12,10 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      celery_worker:
+        condition: service_healthy
+      postgres_test:
+        condition: service_healthy
     networks:
       - app-network
     command: sh -c "./run.sh"
@@ -36,11 +40,8 @@ services:
       - .:/app:delegated
     environment:
       - PYTHONPATH=/app
-    depends_on:
-      backend:
-        condition: service_healthy
     command: >
-      sh -c "python -m celery -A app.core.celery worker -l INFO"
+      sh -c "python -m celery -A app.core.celery worker -l INFO --concurrency=2"
     networks:
       - app-network
     restart: on-failure
@@ -58,7 +59,7 @@ services:
         max-file: "3"
 
   postgres:
-    image: postgres:17.5
+    image: postgres:17.5-alpine
     restart: on-failure
     environment:
       POSTGRES_USER: postgres
@@ -82,7 +83,7 @@ services:
         max-file: "2"
 
   redis:
-    image: redis:8.0.1
+    image: redis:8.0.1-alpine
     restart: on-failure
     volumes:
       - redis_data:/data

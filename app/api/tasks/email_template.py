@@ -1,4 +1,4 @@
-EMAIL_TEMPLATE = """<!DOCTYPE html>
+EMAIL_TEMPLATE_FOR_CODE = """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -108,3 +108,64 @@ EMAIL_TEMPLATE = """<!DOCTYPE html>
     </div>
 </body>
 </html>"""
+
+EMAIL_TEMPLATE_FOR_WARNINGS = """<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Low Stock Alert</title>
+  <style>
+    /* Reset */
+    body, table, td, p { margin:0; padding:0; }
+    img { border:0; display:block; }
+
+    /* Base */
+    body { background-color: #f9f9f9; font-family: Arial, sans-serif; }
+    .wrapper { width:100%; table-layout: fixed; background-color: #f9f9f9; padding: 20px 0; }
+    .container { max-width:600px; margin:0 auto; background-color:#ffffff; border-radius:8px; overflow:hidden; }
+    .header { background-color: #d9534f; color:#ffffff; text-align:center; padding:25px; }
+    .header h2 { font-size:20px; margin:0; }
+    .content { padding:30px; color:#444444; font-size:16px; line-height:1.6; }
+    .button { display:inline-block; padding:10px 20px; background-color:#d9534f; color:#ffffff; text-decoration:none; border-radius:4px; margin-top:20px; }
+    .footer { background-color:#f1f1f1; color:#777777; font-size:12px; text-align:center; padding:15px 30px; }
+    .footer a { color:#d9534f; text-decoration:none; }
+
+    /* Responsive */
+    @media only screen and (max-width: 600px) {
+      .header, .content, .footer { padding:20px !important; }
+      .content { font-size:14px !important; }
+    }
+  </style>
+</head>
+<body>
+  <table class="wrapper" role="presentation" width="100%">
+    <tr>
+      <td align="center">
+        <table class="container" role="presentation" width="100%">
+          <tr>
+            <td class="header">
+              <h2>⚠️ Low Stock Alert</h2>
+            </td>
+          </tr>
+          <tr>
+            <td class="content">
+              <p>Hello,</p>
+              <p>The product <strong>{{PRODUCT_NAME}}</strong> is running low in our warehouse stock.</p>
+              <p>Please restock it as soon as possible to avoid any interruptions.</p>
+              <a href="https://shaxzodbek.com" class="button">View Inventory</a>
+            </td>
+          </tr>
+          <tr>
+            <td class="footer">
+              <p>This is an automated message—please do not reply.</p>
+              <p>Questions? Contact us at <a href="mailto:muxtorovshaxzodbek16@gmail.com">muxtorovshaxzodbek16@gmail.com</a>.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+"""

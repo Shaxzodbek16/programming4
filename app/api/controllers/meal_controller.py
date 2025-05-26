@@ -1,5 +1,6 @@
 from fastapi import Depends, HTTPException, status
 from app.api.repositories import MealRepository, IngredientRepository
+from datetime import datetime
 from app.api.schemas.ingredients_schemas import (
     IngredientReadSchema,
 )
@@ -14,6 +15,13 @@ from app.api.schemas.meal_schemas import (
     PortionQty,
     MealLogListSchema,
     MealLogReadSchema,
+)
+from app.api.schemas.report_schema import (
+    MealLogPortionStats,
+    MealLogQueryParams,
+    PortionByDay,
+    PortionByMonth,
+    PortionByYear,
 )
 
 
@@ -214,3 +222,34 @@ class MealController:
             )
 
         return MealLogReadSchema.model_validate(log)
+
+    async def get_meal_log_portion_stats(
+        self, payload: MealLogQueryParams
+    ) -> MealLogPortionStats:
+
+        day_portion_count, month_portion_count, year_portion_count = (
+            await self.__meal_repository.get_meal_portion_by_time(
+                payload.year, payload.month
+            )
+        )
+        return MealLogPortionStats(
+            daily=[
+                PortionByDay(
+                    date=datetime.now(),
+                    total_portions=day_portion_count,
+                )
+            ],
+            monthly=[
+                PortionByMonth(
+                    month=payload.month,
+                    year=payload.year,
+                    total_portions=month_portion_count,
+                )
+            ],
+            yearly=[
+                PortionByYear(
+                    year=payload.year,
+                    total_portions=year_portion_count,
+                )
+            ],
+        )

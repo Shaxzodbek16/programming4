@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, status, HTTPException
 
 from app.api.controllers import IngredientController
 from app.api.models import User
+from app.api.repositories import UserRepository, IngredientRepository, UnitRepository
+from app.core.databases.postgres import get_session_without_depends
 
 from app.api.schemas.ingredients_schemas import (
     IngredientCreateSchema,
@@ -10,6 +12,7 @@ from app.api.schemas.ingredients_schemas import (
     IngredientListSchema,
     IngredientReadSchema,
 )
+from app.api.tasks import send_warnings
 from app.core.utils.security import get_current_user
 
 router = APIRouter(
@@ -116,9 +119,26 @@ async def delete_ingredient(
     )
 
 
-async def low_stock_ingredients(
-    limit,
-    offset,
-    ingredient_controller: IngredientController = Depends(),
-) -> IngredientListSchema:
-    return await ingredient_controller.low_stock_ingredients(limit, offset)
+async def low_stock_ingredients() -> None:
+    async with get_session_without_depends() as session:
+        ingredient_repository = IngredientRepository(session)
+        unit_repository = UnitRepository(session)
+        ingredient_controller = IngredientController(
+            ingredient_repository=ingredient_repository,
+            unit_repository=unit_repository,
+        )
+        users_repository = UserRepository(session)
+
+        limit, offset = 10, 1
+        while 1:
+            res = (
+                await ingredient_controller.low_stock_ingredients(limit, offset)
+            ).model_dump()
+            if res["total"] == 0:
+                break
+            for ingredient in res["items"]:
+                if ingredient["quantity"] <= ingredient["min_threshold"]:
+                    users = await users_repository.get_admin_users()
+                    for user in users:
+                        send_warnings.delay(user.email, ingredient["name"])
+            offset += 1
