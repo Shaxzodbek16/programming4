@@ -14,8 +14,6 @@ services:
         condition: service_healthy
       celery_worker:
         condition: service_healthy
-      postgres_test:
-        condition: service_healthy
     networks:
       - app-network
     command: sh -c "./run.sh"
