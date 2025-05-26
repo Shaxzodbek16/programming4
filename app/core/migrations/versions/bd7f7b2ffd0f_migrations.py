@@ -1,8 +1,8 @@
 """migrations
 
-Revision ID: 1418a4b087e3
+Revision ID: bd7f7b2ffd0f
 Revises:
-Create Date: 2025-05-24 15:24:41.385959
+Create Date: 2025-05-27 03:15:15.358476
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "1418a4b087e3"
+revision: str = "bd7f7b2ffd0f"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -119,7 +119,11 @@ def upgrade() -> None:
         "ingredient_transactions",
         sa.Column("ingredient_id", sa.Integer(), nullable=False),
         sa.Column("quantity", sa.Numeric(precision=12, scale=2), nullable=False),
-        sa.Column("transaction_type", sa.String(length=10), nullable=False),
+        sa.Column(
+            "transaction_type",
+            sa.Enum("IN", "OUT", name="transaction_type_enum", create_constraint=True),
+            nullable=False,
+        ),
         sa.Column("reference_id", sa.Integer(), nullable=True),
         sa.Column("note", sa.String(length=255), nullable=True),
         sa.Column("happened_at", sa.DateTime(), nullable=False),

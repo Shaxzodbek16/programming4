@@ -12,12 +12,9 @@ settings: Settings = get_settings()
 
 
 def get_ready() -> None:
-    # init()
+    init()
     os.makedirs("media/", exist_ok=True)
     os.makedirs("static/", exist_ok=True)
-
-
-a = ()
 
 
 def get_app() -> FastAPI:
