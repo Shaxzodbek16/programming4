@@ -4,3 +4,4 @@ from .authentication_controller import AuthenticationController
 from .user_controller import UserController
 from .meal_controller import MealController
 from .portion_calculation_controller import PortionCalculationController
+from .alerts_controller import AlertsController

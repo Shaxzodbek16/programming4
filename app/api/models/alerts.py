@@ -27,9 +27,16 @@ class Alert(BaseModel):
     is_resolved: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     resolved_at: Mapped[datetime | None] = mapped_column(DateTime)
 
+    def update(self, **kwargs) -> "Alert":
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+        setattr(self, "updated_at", datetime.now())
+        return self
+
     def resolve(self) -> "Alert":
         self.is_resolved = True
-        self.resolved_at = datetime.utcnow()
+        self.resolved_at = datetime.now()
         return self
 
     def to_dict(self) -> dict:

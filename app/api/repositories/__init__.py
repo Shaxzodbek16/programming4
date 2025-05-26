@@ -4,3 +4,4 @@ from .user_repository import UserRepository
 from .user_otp_repository import UserOtpRepository
 from .meal_repository import MealRepository
 from .portion_calculation_repository import PortionCalculationRepository
+from .alerts_repository import AlertsRepository
