@@ -23,5 +23,18 @@ async def fill_roles():
             await session.refresh(role)
 
 
+def get_event_loop():
+    try:
+        return asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        return loop
+
+
 def init():
-    asyncio.create_task(fill_roles())
+    loop = get_event_loop()
+    if loop.is_running():
+        asyncio.run_coroutine_threadsafe(fill_roles(), loop)
+    else:
+        loop.run_until_complete(fill_roles())

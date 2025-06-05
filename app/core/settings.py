@@ -19,6 +19,12 @@ class Settings(BaseSettings):
     POSTGRES_PORT: str
     POSTGRES_DATABASE: str
 
+    TEST_POSTGRES_USER: str
+    TEST_POSTGRES_PASSWORD: str
+    TEST_POSTGRES_HOST: str
+    TEST_POSTGRES_PORT: str
+    TEST_POSTGRES_DATABASE: str
+
     # REDIS CREDENTIALS
     REDIS_HOST: str
     REDIS_PORT: str
@@ -39,12 +45,16 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env")
 
     @property
-    def get_postgres_url(self):
+    def get_postgres_url(self) -> str:
         return f"{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DATABASE}"
 
     @property
-    def get_redis_url(self):
+    def get_redis_url(self) -> str:
         return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
+
+    @property
+    def get_test_database_url(self) -> str:
+        return f"{self.TEST_POSTGRES_USER}:{self.TEST_POSTGRES_PASSWORD}@{self.TEST_POSTGRES_HOST}:{self.TEST_POSTGRES_PORT}/{self.TEST_POSTGRES_DATABASE}"
 
 
 @cache

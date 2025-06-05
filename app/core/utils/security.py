@@ -18,7 +18,16 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-class JWTHandler:
+class SingletonMeta(type):
+    _instances: dict[type, object] = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super().__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+
+class JWTHandler(metaclass=SingletonMeta):
     def __init__(self, user_repository: UserRepository = Depends()) -> None:
         self._settings: Settings = get_settings()
         self._secret_key: str = self._settings.SECRET_KEY
@@ -97,7 +106,7 @@ class JWTHandler:
         return user
 
 
-class Security:
+class Security(metaclass=SingletonMeta):
     @staticmethod
     def hash_password(password: str) -> str:
         return pwd_context.hash(password)

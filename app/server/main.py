@@ -17,9 +17,7 @@ def get_ready() -> None:
     os.makedirs("static/", exist_ok=True)
 
 
-def get_app() -> FastAPI:
-    get_ready()
-
+def get_app() -> CORSMiddleware:
     app = FastAPI(
         title=settings.PROJECT_NAME,
         description=settings.PROJECT_DESCRIPTION,
@@ -30,11 +28,6 @@ def get_app() -> FastAPI:
 
     app.include_router(get_api_v1_router(), prefix=settings.API_V1_STR)
     app.include_router(api_v1_websocket, prefix=settings.API_V1_STR)
-    return app
-
-
-def create_app() -> CORSMiddleware:
-    app = get_app()
     return CORSMiddleware(
         app,
         allow_origins=["*"],
@@ -42,3 +35,8 @@ def create_app() -> CORSMiddleware:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+
+def create_app() -> CORSMiddleware:
+    get_ready()
+    return get_app()

@@ -11,6 +11,18 @@ from app.core.utils.security import security
 app = Typer()
 
 
+def get_event_loop():
+    try:
+        return asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        return loop
+
+
+event_loop = get_event_loop()
+
+
 async def check_superuser_exists(email: str) -> bool:
     async with get_session_without_depends() as session:
         result = await session.execute(select(User).where(User.email == email))
@@ -60,7 +72,7 @@ def createsuperuser():
                     "Invalid email format. Try again.", fg=typer.colors.RED, bold=True
                 )
             )
-        if asyncio.run(check_superuser_exists(email)):
+        if event_loop.run_until_complete(check_superuser_exists(email)):
             break
     while True:
         password = typer.prompt(
@@ -77,7 +89,9 @@ def createsuperuser():
     echo(style("\nSuperuser created successfully!", fg=typer.colors.GREEN, bold=True))
     echo(style(f"Name: {first_name} {last_name}", fg=typer.colors.BLUE))
     echo(style(f"Email: {email}", fg=typer.colors.BLUE))
-    asyncio.run(create_superuser(first_name, last_name, email, password))
+    event_loop.run_until_complete(
+        create_superuser(first_name, last_name, email, password)
+    )
 
 
 @app.command(help="See all superusers.")
@@ -89,7 +103,7 @@ def allsuperusers():
             )
             return result.scalars().all()
 
-    superusers = asyncio.run(fetch_superusers())
+    superusers = event_loop.run_until_complete(fetch_superusers())
     if not superusers:
         echo(style("No superusers found.", fg=typer.colors.YELLOW, bold=True))
     else:
